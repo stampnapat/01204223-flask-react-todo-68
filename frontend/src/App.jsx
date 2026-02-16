@@ -1,10 +1,13 @@
+import TodoItem from './TodoItem.jsx'
 import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
+
 function App() {
-  const TODOLIST_API_URL = 'http://localhost:5000/api/todos/';
+const TODOLIST_API_URL = 'http://127.0.0.1:5000/api/todos/';
+// const TODOLIST_API_URL = 'http://localhost:5000/api/todos/';
 
   const [todoList, setTodoList] = useState([]);
   const [newTitle, setNewTitle] = useState("");
@@ -26,20 +29,21 @@ function App() {
     }
   }
 
-  async function toggleDone(id) {
-    const toggle_api_url = `${TODOLIST_API_URL}${id}/toggle/`
-    try {
-      const response = await fetch(toggle_api_url, {
-        method: 'PATCH',
-      })
-      if (response.ok) {
-        const updatedTodo = await response.json();
-        setTodoList(todoList.map(todo => todo.id === id ? updatedTodo : todo));
-      }
-    } catch (error) {
-      console.error("Error toggling todo:", error);
-    }
+async function toggleDone(id) {
+  try {
+    const response = await fetch(`${TODOLIST_API_URL}${id}/toggle/`, {
+      method: 'PATCH',
+    });
+    if (!response.ok) return;
+
+    const updatedTodo = await response.json();
+    setTodoList(prev => prev.map(todo => (todo.id === id ? updatedTodo : todo)));
+  } catch (error) {
+    console.error("Error toggling todo:", error);
   }
+}
+
+
 
   async function addNewTodo() {
     try {
@@ -60,30 +64,56 @@ function App() {
     }
   }
 
-  async function deleteTodo(id) {
-    const delete_api_url = `${TODOLIST_API_URL}${id}/`
-    try {
-      const response = await fetch(delete_api_url, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setTodoList(todoList.filter(todo => todo.id !== id));
-      }
-    } catch (error) {
-      console.error("Error deleting todo:", error);
+
+async function deleteTodo(id) {
+  try {
+    const url = `${TODOLIST_API_URL}${id}/`;
+    const response = await fetch(url, { method: "DELETE" });
+
+    const text = await response.text();
+    console.log("DELETE", url, "=>", response.status, text);
+
+    if (!response.ok) {
+      alert(`ลบไม่สำเร็จ: ${response.status}`);
+      return;
     }
+
+    setTodoList(prev => prev.filter(todo => todo.id !== id));
+  } catch (e) {
+    console.error(e);
+    alert("ลบไม่สำเร็จ (เช็ค backend)");
   }
+}
+
+async function addNewComment(todoId, newComment) {
+  try {
+    const url = `${TODOLIST_API_URL}${todoId}/comments/`
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: newComment }),
+    })
+
+    if (response.ok) {
+      await fetchTodoList()
+    }
+  } catch (error) {
+    console.error("Error adding new comment:", error)
+  }
+}
 
   return (
     <>
       <h1>Todo List</h1>
       <ul>
         {todoList.map(todo => (
-          <li key={todo.id}>
-            <span className={todo.done ? "done" : ""}>{todo.title}</span>
-            <button onClick={() => {toggleDone(todo.id)}}>Toggle</button>
-            <button onClick={() => {deleteTodo(todo.id)}}>❌</button>
-          </li>
+          <TodoItem
+          key={todo.id}
+          todo={todo}
+          toggleDone={toggleDone}
+          deleteTodo={deleteTodo}
+          addNewComment={addNewComment}
+          />
         ))}
       </ul>
       New: <input type="text" value={newTitle} onChange={(e) => {setNewTitle(e.target.value)}} />

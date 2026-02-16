@@ -6,7 +6,13 @@ from models import TodoItem, Comment, db
 
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app, resources={r"/api/*": {"origins": [
+#     "http://localhost:5173",
+#     "http://127.0.0.1:5173",
+# ]}})
+
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todos.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -49,12 +55,24 @@ def toggle_todo(id):
     return jsonify(todo.to_dict())
 
 
+# @app.route("/api/todos/<int:id>/", methods=["DELETE"])
+# def delete_todo(id):
+#     todo = TodoItem.query.get_or_404(id)
+#     db.session.delete(todo)
+#     db.session.commit()
+#     return jsonify({"message": "Todo deleted successfully"})
+
 @app.route("/api/todos/<int:id>/", methods=["DELETE"])
 def delete_todo(id):
     todo = TodoItem.query.get_or_404(id)
+
+    # ลบ comments ที่ผูกกับ todo นี้ก่อน (กัน FK ตีกลับ)
+    Comment.query.filter_by(todo_id=id).delete()
+
     db.session.delete(todo)
     db.session.commit()
     return jsonify({"message": "Todo deleted successfully"})
+
 
 
 @app.route("/api/todos/<int:todo_id>/comments/", methods=["POST"])
