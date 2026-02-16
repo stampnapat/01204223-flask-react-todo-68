@@ -11,11 +11,21 @@ const baseTodo = {             // ** TodoItem พื้นฐานสำหร�
 };
 
 describe('TodoItem', () => {
-  it('renders with no comments correctly', () => {    
-    // *** โค้ดสำหรับเทสที่เพิ่มเข้ามา
+  it('renders with comments correctly', () => {
+    const todoWithComment = {
+      ...baseTodo,
+      comments: [
+        {id: 1, message: 'First comment'},
+        {id: 2, message: 'Another comment'},
+      ]
+    };
     render(
-      <TodoItem todo={baseTodo} />
+      <TodoItem todo={todoWithComment} />
     );
     expect(screen.getByText('Sample Todo')).toBeInTheDocument();
+    //
+    // *** TODO: ให้เพิ่ม assertion ว่ามีข้อความ First comment และ Another comment บนหน้าจอ
+    expect(screen.getByText('First comment')).toBeInTheDocument();
+    expect(screen.getByText('Another comment')).toBeInTheDocument();
   });
 });
