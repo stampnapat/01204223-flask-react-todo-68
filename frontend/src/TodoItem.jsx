@@ -1,8 +1,8 @@
-import { useState } from "react";
-import "./App.css";
+import { useState } from "react"
+import "./App.css"
 
 function TodoItem({ todo, toggleDone, deleteTodo, addNewComment }) {
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState("")
 
   return (
     <li>
@@ -27,15 +27,15 @@ function TodoItem({ todo, toggleDone, deleteTodo, addNewComment }) {
         />
         <button
           onClick={() => {
-            addNewComment(todo.id, newComment);
-            setNewComment("");
+            addNewComment(todo.id, newComment)
+            setNewComment("")
           }}
         >
           Add Comment
         </button>
       </div>
     </li>
-  );
+  )
 }
 
-export default TodoItem;
+export default TodoItem
