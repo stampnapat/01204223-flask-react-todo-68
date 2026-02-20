@@ -128,8 +128,14 @@ def login():
         return jsonify({'error': 'Invalid username or password'}), 401
 
     access_token = create_access_token(identity=user.username)
-    return jsonify(access_token=access_token
+    return jsonify(access_token=access_token)
 
 
 app.config['JWT_SECRET_KEY'] = 'fdsjkfjioi2rjshr2345hrsh043j5oij5545'
 jwt = JWTManager(app)
+
+@app.route('/api/todos/', methods=['GET'])
+@jwt_required()
+def get_todos():
+    todos = TodoItem.query.all()
+    return jsonify([todo.to_dict() for todo in todos])
