@@ -1,21 +1,28 @@
 import { useState, useEffect } from "react"
 import "./App.css"
 import TodoItem from "./TodoItem.jsx"
+import { useAuth } from "./context/AuthContext.jsx";
 
 function TodoList({ apiUrl }) {
   const TODOLIST_API_URL = apiUrl
 
   const [todoList, setTodoList] = useState([])
   const [newTitle, setNewTitle] = useState("")
+    const { username, accessToken, logout } = useAuth();
+
 
   useEffect(() => {
     fetchTodoList()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [username])
 
   async function fetchTodoList() {
-    try {
-      const response = await fetch(TODOLIST_API_URL)
+          try {
+      const response = await fetch(TODOLIST_API_URL, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+    });
       if (!response.ok) {
         throw new Error("Network error")
       }
@@ -24,6 +31,7 @@ function TodoList({ apiUrl }) {
     } catch (err) {
       // alert("Failed to fetch todo list from backend. Make sure the backend is running.")
       console.error(err)
+      setTodoList([]);
     }
   }
 
@@ -127,8 +135,20 @@ function TodoList({ apiUrl }) {
       >
         Add
       </button>
-      <br />
-        <a href="/about">About</a>
+<br />
+<a href="/about">About</a>
+<br />
+{username && (
+  <a
+    href="#"
+    onClick={(e) => {
+      e.preventDefault();
+      logout();
+    }}
+  >
+    Logout
+  </a>
+)}
     </>
   )
 }
