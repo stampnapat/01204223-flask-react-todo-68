@@ -39,6 +39,9 @@ function TodoList({ apiUrl }) {
     try {
       const response = await fetch(`${TODOLIST_API_URL}${id}/toggle/`, {
         method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       })
       if (!response.ok) return
 
@@ -55,6 +58,7 @@ function TodoList({ apiUrl }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ title: newTitle }),
       })
@@ -71,7 +75,12 @@ function TodoList({ apiUrl }) {
   async function deleteTodo(id) {
     try {
       const url = `${TODOLIST_API_URL}${id}/`
-      const response = await fetch(url, { method: "DELETE" })
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
 
       const text = await response.text()
       console.log("DELETE", url, "=>", response.status, text)
@@ -93,7 +102,10 @@ function TodoList({ apiUrl }) {
       const url = `${TODOLIST_API_URL}${todoId}/comments/`
       const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({ message: newComment }),
       })
 
