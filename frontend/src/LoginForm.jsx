@@ -1,59 +1,65 @@
-import { useState } from "react"
-import "./App.css"
+import { useState } from "react";
+import "./App.css";
 import { useAuth } from "./context/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 function LoginForm({ loginUrl }) {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
-const { login, username: loggedInUsername } = useAuth()
-const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-async function handleLogin(e) {
-  e.preventDefault();
-  setErrorMessage(""); // เคลียร์ข้อความเก่าทุกครั้งที่กด login
+  async function handleLogin(e) {
+    e.preventDefault();
+    setErrorMessage("");
 
-  try {
-    const response = await fetch(loginUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: username, password: password }),
-    });
+    try {
+      const response = await fetch(loginUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-      alert("Login successful. access token = " + data.access_token);
-      login(username, data.access_token);
-      navigate("/");
-
-    } else if (response.status === 401) {
-      setErrorMessage("Invalid username or password");
-    } else {
-      setErrorMessage("Login failed");
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        // alert("Login successful. access token = " + data.access_token);
+        login(username, data.access_token);
+        navigate("/");
+      } else if (response.status === 401) {
+        setErrorMessage("Invalid username or password");
+      } else {
+        setErrorMessage("Login failed");
+      }
+    } catch (error) {
+      console.log("Error logging in:", error);
+      setErrorMessage("Network error");
     }
-  } catch (error) {
-    console.log("Error logging in:", error);
-    setErrorMessage("Network error");
   }
-}    
 
   return (
-    <form onSubmit={(e) => handleLogin(e)}>
-        {errorMessage && <p>{errorMessage}</p>}
-
+    <form onSubmit={handleLogin}>
+      {errorMessage && <p>{errorMessage}</p>}
       Username:
-      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
       <br />
       Password:
-      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <br />
       <button type="submit">Login</button>
     </form>
-  )
+  );
 }
 
-export default LoginForm
+export default LoginForm;

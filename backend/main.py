@@ -14,7 +14,10 @@ app = Flask(__name__)
 #     "http://127.0.0.1:5173",
 # ]}})
 
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={r"/api/*": {"origins": [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]}})
 
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///todos.db"
@@ -128,4 +131,4 @@ def login():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)
