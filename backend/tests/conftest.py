@@ -12,7 +12,6 @@ from models import db
 
 
 
-
 @pytest.fixture
 def app():
     flask_app.config.update(
